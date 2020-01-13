@@ -23,3 +23,11 @@
 /doc/.build/
 /doc/xml-c/
 /doc/xml-java/
+native_client/java/libdeepspeech/.settings/org.eclipse.buildship.core.prefs
+native_client/java/libdeepspeech/.project
+native_client/java/libdeepspeech/.classpath
+native_client/java/app/.project
+native_client/java/app/.settings/org.eclipse.buildship.core.prefs
+native_client/java/app/.classpath
+native_client/java/.settings/org.eclipse.buildship.core.prefs
+native_client/java/.project
