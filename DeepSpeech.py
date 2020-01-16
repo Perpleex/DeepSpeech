@@ -595,46 +595,47 @@ def train():
             #tf.initialize_all_variables().run()
             tfv1.get_default_graph().finalize()
             loaded = try_loading(session, best_dev_saver, 'best_dev_checkpoint', 'best validation')
-        if not loaded and FLAGS.load == "transfer":
-            if FLAGS.source_model_checkpoint_dir:
-                print('Initializing model from', FLAGS.source_model_checkpoint_dir)
-                ckpt = tfv1.train.load_checkpoint(FLAGS.source_model_checkpoint_dir)
-                variables = list(ckpt.get_variable_to_shape_map().keys())
-                print('variable', variables)
-                print('global', tf.global_variables())				
-                # Load desired source variables
-                missing_variables2 = []				
-                for v in tf.global_variables():
-                    if not any(layer in v.op.name for layer in drop_source_layers):
-                        print('Loading', v.op.name)
-                        try:						
-                            v.load(ckpt.get_tensor(v.op.name), session=session)
-                            print('OK')
-                        except tf.errors.NotFoundError:
-                            missing_variables2.append(v)
-                            print('KO')
-                        except ValueError:
-                            #missing_variables2.append(v)
-                            print('KO for valueError')						
-                print('missing_variables =', missing_variables2)					
-                # Initialize all variables needed for DS, but not loaded from ckpt
-				
-                init_op = tfv1.variables_initializer(
-                    [v for v in tf.global_variables()
-                     if any(layer in v.op.name
-                            for layer in drop_source_layers)
-                     ] + missing_variables2)	 
-                session.run(init_op)
-                tfv1.get_default_graph().finalize()
+        if not loaded : 
+            if FLAGS.load == "transfer":
+                if FLAGS.source_model_checkpoint_dir:
+                    print('Initializing model from', FLAGS.source_model_checkpoint_dir)
+                    ckpt = tfv1.train.load_checkpoint(FLAGS.source_model_checkpoint_dir)
+                    variables = list(ckpt.get_variable_to_shape_map().keys())
+                    print('variable', variables)
+                    print('global', tf.global_variables())				
+                    # Load desired source variables
+                    missing_variables2 = []				
+                    for v in tf.global_variables():
+                        if not any(layer in v.op.name for layer in drop_source_layers):
+                            print('Loading', v.op.name)
+                            try:						
+                                v.load(ckpt.get_tensor(v.op.name), session=session)
+                                print('OK')
+                            except tf.errors.NotFoundError:
+                                missing_variables2.append(v)
+                                print('KO')
+                            except ValueError:
+                                #missing_variables2.append(v)
+                                print('KO for valueError')						
+                    print('missing_variables =', missing_variables2)					
+                    # Initialize all variables needed for DS, but not loaded from ckpt
+                    
+                    init_op = tfv1.variables_initializer(
+                        [v for v in tf.global_variables()
+                        if any(layer in v.op.name
+                                for layer in drop_source_layers)
+                        ] + missing_variables2)	 
+                    session.run(init_op)
+                    tfv1.get_default_graph().finalize()
 			
-        elif FLAGS.load in ['auto', 'init']:
-            log_info('Initializing variables...')
-            tfv1.get_default_graph().finalize()
-            session.run(initializer)
-        else:
-            log_error('Unable to load %s model from specified checkpoint dir'
-                      ' - consider using load option "auto" or "init".' % FLAGS.load)
-            sys.exit(1)
+            elif FLAGS.load in ['auto', 'init']:
+                log_info('Initializing variables...')
+                tfv1.get_default_graph().finalize()
+                session.run(initializer)
+            else:
+                log_error('Unable to load %s model from specified checkpoint dir'
+                        ' - consider using load option "auto" or "init".' % FLAGS.load)
+                sys.exit(1)
 
 
         def run_set(set_name, epoch, init_op, dataset=None):
