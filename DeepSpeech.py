@@ -624,9 +624,10 @@ def train():
                         [v for v in tf.global_variables()
                         if any(layer in v.op.name
                                 for layer in drop_source_layers)
-                        ] + missing_variables2)	 
-                    session.run(init_op)
+                        ] + missing_variables2)
                     tfv1.get_default_graph().finalize()
+                    session.run(init_op)
+                   
 			
             elif FLAGS.load in ['auto', 'init']:
                 log_info('Initializing variables...')
